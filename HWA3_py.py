@@ -31,6 +31,7 @@ import random
 
 
 def get_random_centroids(X, k):
+    np.random.seed(43)
     return random.sample(list(X), k)
 
 
@@ -38,15 +39,13 @@ C = get_random_centroids(image, 5)
 
 
 #%%
-def minkowski(x,centroid,p):
-    return (sum(np.abs(x-centroid)**p))**(1/p)
+def minkowski(X,centroid,p):
+    return (np.sum(np.abs(X-centroid)**p, axis = 1)**(1/p))
 #%%
 def lp_distance(X, centroids, p=2):
     distances = []
     for c in centroids:
-        c_distance = []
-        for x in X:
-           c_distance.append(minkowski(x,c,p))
+        c_distance= (minkowski(X,c,p))
         distances.append(c_distance)
     print('dist calculated')
     return np.array(distances)
@@ -76,10 +75,11 @@ def kmeans(X, k, p ,max_iter=100):
             clusters.append(X[k_indices])
         new_centroids = [(np.round(np.mean(np.array(c),axis=0), decimals=3)) for c in clusters]
         if np.all([np.array_equal(a, b) for a, b in zip(centroids, new_centroids)]) or max_iter == 0 :
+            print(max_iter)
             return np.array(centroids), np.array(classes)
         centroids = new_centroids
 #%%
-centroids, classes = kmeans(image, 16, p=1, max_iter=3)
+centroids, classes = kmeans(image, 48, p=1, max_iter=100)
 #%%
 classes = classes.reshape(rows,cols)
 compressed_image = np.zeros((classes.shape[0], classes.shape[1], 3), dtype=np.uint8)
